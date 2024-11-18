@@ -2,11 +2,13 @@
 
 ## Overview
 
-The **Playlist Updater** is a Python application designed to **update RetroArch playlist files** (`.lpl`) by synchronizing ROMs between source and destination playlists. It ensures consistency across multiple directories, whether local setups, USB drives, gaming consoles, etc.
+The **Playlist Updater** is a Python application designed to **update RetroArch playlist files** (`.lpl`) by synchronizing ROMs between source and destination playlists. It ensures playlist rom parity across multiple directories, whether local setups, USB drives, gaming consoles, etc.
 
 ### Main Appeal
 
 The **main appeal** is the ability to **copy ROMs** from **source playlists** to **destination playlists** while **retaining custom labels**, ideal for syncing playlists across systems without losing personal settings.
+
+This tool is only for those that want to keep their playlists/roms the same in several locations (Say, you have the exact same SNES Roms/Romhacks in your PC emulator and your USB/Console, but now you want to add more while retaining your labels and updating all the different setups' playlists is a chore). Instead of manually refreshing/rebuilding the playlists/.lpl everywhere (your portable USB setup, your console setup, etc.), you only fix one playlist group (Say, PC's setup) and then this app updates the changes in the other chosen setups for you.
 
 ### What It Does
 
@@ -85,7 +87,7 @@ If any fields are missing or incorrect, the tool won’t update the playlist cor
     - Use **Select All** to select all playlists in the destination folder.
 
 5. **Execute the Update**:
-    - Click **EXECUTE** to update the selected playlists in the Destination list with ROM paths from the Source playlists.
+    - Click **EXECUTE** to update the selected playlists in the Destination list with the ROMs listed in the Source playlists.
 
 * **Refresh the App**:
     - Click **Refresh** to reset the folder paths and clear listboxes.
