@@ -34,6 +34,11 @@ For proper operation, the **destination playlist** must contain:
   "scan_content_dir": "D:\\RetroArch\\Emulator\\Game Boy Advance\\Roms"
 }
 ```
+In this example:
+
+- The **default_core_path** specifies the full path to the core `mgba_libretro.dll`, which will be used for Game Boy Advance ROMs in the playlist.
+- The **default_core_name** provides the name of the core, which helps RetroArch identify the emulator to use.
+- The **scan_content_dir** points to the folder where the Game Boy Advance ROMs are located (`D:\\RetroArch\\Emulator\\Game Boy Advance\\Roms`). This is the directory where the ROM paths in the playlist will be updated to (It'll also work if the path contains `\`, `/` or `//` in the paths).
 
 If any fields are missing or incorrect, the tool won’t update the playlist correctly.
 
