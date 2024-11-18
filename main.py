@@ -15,4 +15,4 @@ if __name__ == "__main__":
     main()
 
 
-#pyinstaller --onefile --windowed --icon=Undine.ico --add-data "Undine.ico;." main.py
+#pyinstaller --onefile --windowed --icon=Undine.ico --add-data "Undine.ico;." --name RetroArchPlaylistUpdater main.py

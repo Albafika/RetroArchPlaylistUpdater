@@ -105,7 +105,7 @@ If any fields are missing or incorrect, the tool won’t update the playlist cor
 2. **Build the Executable**:
 
     ```bash
-    pyinstaller --onefile --windowed --icon=Undine.ico --add-data "Undine.ico;." main.py
+    pyinstaller --onefile --windowed --icon=Undine.ico --add-data "Undine.ico;." --name RetroArchPlaylistUpdater main.py
     ```
 
 3. **Locate the Executable**:
