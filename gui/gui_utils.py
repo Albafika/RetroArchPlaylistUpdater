@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
@@ -58,7 +59,7 @@ def create_widgets(app):
     app.refresh_button = tk.Button(app.root, text="Refresh", command=app.refresh_app, bg="#2196F3", fg="white", font=("Helvetica", 12), bd=0, relief="solid")
     app.refresh_button.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
 
-def update_file_list(folder, listbox):
+def update_file_list(app, folder, listbox):
     """Update the file list in the listbox."""
     listbox.delete(0, tk.END)  # Clear existing items
     try:

@@ -3,7 +3,7 @@ import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from utils.file_handler import process_folders
-from gui.gui_utils import create_menu, create_widgets, show_about
+from gui.gui_utils import create_menu, create_widgets, show_about, update_file_list
 
 def resource_path(relative_path):
     """Get the absolute path to a resource in the bundled executable."""
@@ -43,46 +43,6 @@ class PlaylistUpdaterApp:
         """Exit the application."""
         self.root.quit()
 
-    def create_widgets(self):
-        """Create GUI components."""
-        self.source_label = tk.Label(self.root, text="Source Playlists", bg="#F0F0F0", font=("Helvetica", 12, "bold"))
-        self.source_label.grid(row=0, column=0, padx=10, pady=5, sticky="ew")
-
-        self.DESTINATION_label = tk.Label(self.root, text="Destination Playlists", bg="#F0F0F0", font=("Helvetica", 12, "bold"))
-        self.DESTINATION_label.grid(row=0, column=1, padx=10, pady=5, sticky="ew")
-
-        self.source_listbox = tk.Listbox(self.root, height=10, width=30, font=("Helvetica", 10), bg="#FFFFFF", selectmode=tk.SINGLE, bd=2, relief="solid")
-        self.source_listbox.grid(row=1, column=0, padx=20, pady=10)
-
-        self.DESTINATION_listbox = tk.Listbox(self.root, height=10, width=30, font=("Helvetica", 10), bg="#FFFFFF", selectmode=tk.MULTIPLE, bd=2, relief="solid")
-        self.DESTINATION_listbox.grid(row=1, column=1, padx=20, pady=10)
-
-        self.select_all_button = tk.Button(self.root, text="Select All", command=self.select_all, bg="#4CAF50", fg="white", font=("Helvetica", 12), bd=0, relief="solid")
-        self.select_all_button.grid(row=2, column=1, padx=10, pady=5)
-
-        self.clear_selection_button = tk.Button(self.root, text="Clear Selection", command=self.clear_selection, bg="#FF9800", fg="white", font=("Helvetica", 12), bd=0, relief="solid")
-        self.clear_selection_button.grid(row=3, column=1, padx=10, pady=5)
-
-        self.execute_button = tk.Button(self.root, text="EXECUTE", command=self.execute, bg="#4CAF50", fg="white", font=("Helvetica", 12), bd=0, relief="solid")
-        self.execute_button.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
-
-        self.note_label = tk.Label(self.root, text=(
-            "Only the selected playlists in the Destination list will be updated, "
-            "if they exist in the Source list with the same name."
-        ), bg="#F0F0F0", font=("Helvetica", 10), fg="gray")
-        self.note_label.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
-
-        self.source_folder_label = tk.Label(self.root, text="No source folder selected", bg="#F0F0F0", font=("Helvetica", 10))
-        self.source_folder_label.grid(row=2, column=0, padx=20, pady=5, sticky="ew")
-        self.source_folder_label.bind("<Button-1>", self.on_source_folder_label_click)
-
-        self.DESTINATION_folder_label = tk.Label(self.root, text="No destination folder selected", bg="#F0F0F0", font=("Helvetica", 10))
-        self.DESTINATION_folder_label.grid(row=3, column=0, padx=20, pady=5, sticky="ew")
-        self.DESTINATION_folder_label.bind("<Button-1>", self.on_DESTINATION_folder_label_click)
-
-        self.refresh_button = tk.Button(self.root, text="Refresh", command=self.refresh_app, bg="#2196F3", fg="white", font=("Helvetica", 12), bd=0, relief="solid")
-        self.refresh_button.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
-
     def on_source_folder_label_click(self, event):
         """Handle click on source folder label."""
         self.select_source_folder()
@@ -118,13 +78,7 @@ class PlaylistUpdaterApp:
 
     def update_file_list(self, folder, listbox):
         """Update the file list in the listbox."""
-        listbox.delete(0, tk.END)  # Clear existing items
-        try:
-            files = [f for f in os.listdir(folder) if f.endswith(".lpl")]
-            for file in files:
-                listbox.insert(tk.END, file)
-        except Exception as e:
-            print(f"Error loading files: {e}")
+        update_file_list(self, folder, listbox)
 
     def select_all(self):
         """Select all items in the Destination listbox."""
