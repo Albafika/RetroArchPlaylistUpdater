@@ -58,6 +58,9 @@ def create_widgets(app):
 
     app.refresh_button = tk.Button(app.root, text="Refresh", command=app.refresh_app, bg="#2196F3", fg="white", font=("Helvetica", 12), bd=0, relief="solid")
     app.refresh_button.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
+    
+    app.backup_checkbox = tk.Checkbutton(app.root, text="Backup Destination Playlists", variable=app.backup_var)
+    app.backup_checkbox.grid(row=6, column=1, padx=5, pady=5)
 
 def update_file_list(app, folder, listbox):
     """Update the file list in the listbox."""

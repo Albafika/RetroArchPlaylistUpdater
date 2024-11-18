@@ -1,7 +1,9 @@
 import os
 import sys
 import tkinter as tk
+import shutil
 from tkinter import filedialog, messagebox
+from datetime import datetime
 from utils.file_handler import process_folders
 from gui.gui_utils import create_menu, create_widgets, show_about, update_file_list
 
@@ -29,6 +31,7 @@ class PlaylistUpdaterApp:
         icon_path = resource_path("Undine.ico")  # Replace with the correct icon filename
         self.root.iconbitmap(icon_path)
 
+        self.backup_var = tk.BooleanVar()
         # Set the initial folder paths to None
         self.source_folder = None
         self.DESTINATION_folder = None
@@ -61,6 +64,8 @@ class PlaylistUpdaterApp:
         
         self.source_listbox.delete(0, tk.END)
         self.DESTINATION_listbox.delete(0, tk.END)
+        
+        self.backup_var.set(False)
 
     def select_source_folder(self):
         """Open dialog to select the SOURCE folder."""
@@ -89,12 +94,38 @@ class PlaylistUpdaterApp:
         """Clear all selections in the Destination listbox."""
         self.DESTINATION_listbox.selection_clear(0, tk.END)
 
+    def backup_destination(self):
+            # Use the DESTINATION_folder set in the app
+            destination_folder = self.DESTINATION_folder  # Get folder from the class instance
+
+            if not destination_folder:  # Check if the destination folder is set
+                messagebox.showerror("Error", "Destination folder not selected!")
+                return
+
+            # Create a timestamp for the backup folder name
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_folder = os.path.join(destination_folder, f"backup_{timestamp}")
+
+            # Ensure the backup folder exists
+            os.makedirs(backup_folder, exist_ok=True)
+
+            # Copy the .lpl files (or other necessary files) to the backup folder
+            for file_name in os.listdir(destination_folder):
+                if file_name.endswith('.lpl'):  # Adjust if necessary to other types of playlists
+                    source_file = os.path.join(destination_folder, file_name)
+                    backup_file = os.path.join(backup_folder, file_name)
+                    shutil.copy2(source_file, backup_file)  # Copy the file and preserve metadata
+
+            print(f"Backup completed to {backup_folder}")
+
     def execute(self):
         """Execute the process of updating the destination files."""
         selected_files = [self.DESTINATION_listbox.get(i) for i in self.DESTINATION_listbox.curselection()]
         if not selected_files:
             messagebox.showwarning("No files selected", "Please select at least one file to update.")
             return
+        if self.backup_var.get():  # If checkbox is checked
+            self.backup_destination()  # Perform backup
 
         updated_files = process_folders(self.source_folder, self.DESTINATION_folder, selected_files)
         if updated_files:
