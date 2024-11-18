@@ -2,8 +2,8 @@ import os
 import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from utils.json_handler import load_json, save_json, modify_json_file
 from utils.file_handler import process_folders
+from gui.gui_utils import create_menu, create_widgets, show_about
 
 def resource_path(relative_path):
     """Get the absolute path to a resource in the bundled executable."""
@@ -34,27 +34,10 @@ class PlaylistUpdaterApp:
         self.DESTINATION_folder = None
 
         # Create the menu bar
-        self.create_menu()
+        create_menu(self)
 
         # Create the UI components
-        self.create_widgets()
-
-    def create_menu(self):
-        """Create the menu bar with File and Help options."""
-        menu_bar = tk.Menu(self.root, bg="#007ACC", fg="white", font=("Helvetica", 10))
-
-        file_menu = tk.Menu(menu_bar, tearoff=0, bg="#0099FF", fg="white")
-        file_menu.add_command(label="Select Source Folder", command=self.select_source_folder)
-        file_menu.add_command(label="Select Destination Folder", command=self.select_DESTINATION_folder)
-        file_menu.add_command(label="Refresh", command=self.refresh_app)
-        file_menu.add_command(label="Exit", command=self.exit_app)
-        menu_bar.add_cascade(label="File", menu=file_menu)
-
-        help_menu = tk.Menu(menu_bar, tearoff=0, bg="#0099FF", fg="white")
-        help_menu.add_command(label="About", command=self.show_about)
-        menu_bar.add_cascade(label="Help", menu=help_menu)
-
-        self.root.config(menu=menu_bar)
+        create_widgets(self)
 
     def exit_app(self):
         """Exit the application."""
@@ -167,46 +150,4 @@ class PlaylistUpdaterApp:
 
     def show_about(self):
         """Show an 'About' message in a custom window with a fixed size."""
-        about_window = tk.Toplevel(self.root)
-        about_window.title("About")
-        about_window.geometry("700x500")
-        about_window.resizable(False, False)  # Make the window non-resizable
-
-        # Add a Text widget with a scrollbar for displaying the about text
-        text_frame = tk.Frame(about_window, bg="#F0F0F0")
-        text_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-
-        about_text = (
-            "RetroArch Playlist Updater & Synchronizer by GoodLuckTrying\n\n"
-            "- This tool helps you keep multiple instances of RetroArch's playlists (.lpl) in parity (and most importantly, retain custom labels).\n"
-            "- It does not update your ROMs or ROM folders.\n"
-            "- It copies all listed ROMs from the source playlist to the destination playlist (Update will only happen between playlists sharing name between folders).\n\n"
-            "Main features:\n"
-            "1. Copy ROMs from source playlists to destination playlists while retaining custom labels.\n"
-            "2. Update core paths and names in destination playlists.\n"
-            "3. Adjust destination playlists' ROM paths using scan_content_dir\n\n"
-            "Required fields in the **destination playlist** for this app to work correctly:\n"
-            "1. **default_core_path**: Path to the default core that will be used for the ROMs.\n"
-            "2. **default_core_name**: Name of the default core to use for the ROMs.\n"
-            "3. **scan_content_dir**: Directory where the ROMs are stored, which will be used to update ROM paths.\n\n"
-            "This app is perfect for maintaining ROM playlist parity across local setups, USB drives, and even consoles.\n\n"
-            "For any questions, bug reports, or feature requests, feel free to contact me:\n"
-            "Email: goodlucktrying00@gmail.com\n"
-            "Discord: GoodLuckTrying\n"
-            "GitHub: https://github.com/Albafika/RetroArchPlaylistUpdater\n"
-            "I'll do my best to assist you!"
-        )
-
-        text_widget = tk.Text(text_frame, wrap=tk.WORD, font=("Helvetica", 10), bg="#F0F0F0", fg="black", bd=0)
-        text_widget.insert(tk.END, about_text)
-        text_widget.config(state=tk.DISABLED)  # Make the text widget read-only
-        text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-        scrollbar = tk.Scrollbar(text_frame, orient=tk.VERTICAL, command=text_widget.yview)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        text_widget.config(yscrollcommand=scrollbar.set)
-
-        # Add a Close button
-        close_button = tk.Button(about_window, text="Close", command=about_window.destroy, bg="#4CAF50", fg="white", font=("Helvetica", 12))
-        close_button.pack(pady=10)
-
+        show_about(self)
