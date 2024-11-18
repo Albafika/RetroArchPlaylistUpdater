@@ -133,21 +133,79 @@ class PlaylistUpdaterApp:
 
     def select_SOURCE_folder(self):
         """Open dialog to select the SOURCE folder."""
+        # Open the file dialog to select a folder
         self.SOURCE_folder = filedialog.askdirectory(title="Select the Source Folder")
+        
         if self.SOURCE_folder:
-            # Update the folder label to show the selected folder
-            self.source_entry.delete(0, tk.END)  # Clear the current entry
-            self.source_entry.insert(0, self.SOURCE_folder)  # Insert the new folder path
-            self.update_file_list(self.SOURCE_folder, self.source_listbox)
+            # If folder was selected, validate it
+            if self.FOLDER_CONFIRMATION(self.SOURCE_folder):
+                self.source_entry.delete(0, tk.END)  # Clear the current entry
+                self.source_entry.insert(0, self.SOURCE_folder)  # Insert the new folder path
+                self.update_file_list(self.SOURCE_folder, self.source_listbox)  # Update file list in listbox
+                # Change the checkmark button color to lightgreen
+                self.checkmark_button_source.config(bg="lightgreen")
+                print("Source folder is valid and contains playlists.")
+            else:
+                # Folder exists but does not contain .lpl files
+                self.source_entry.delete(0, tk.END)
+                # Change the checkmark button color to gray
+                self.checkmark_button_source.config(bg="gray")
+        else:
+            # If no folder is selected
+            self.source_entry.delete(0, tk.END)
+            # Change the checkmark button color to gray
+            self.checkmark_button_source.config(bg="gray")
 
     def select_DESTINATION_folder(self):
         """Open dialog to select the DESTINATION folder."""
+        # Open the file dialog to select a folder
         self.DESTINATION_folder = filedialog.askdirectory(title="Select the Destination Folder")
+        
         if self.DESTINATION_folder:
-            # Update the folder label to show the selected folder
-            self.destination_entry.delete(0, tk.END)  # Clear the current entry
-            self.destination_entry.insert(0, self.DESTINATION_folder)  # Insert the new folder path
-            self.update_file_list(self.DESTINATION_folder, self.destination_listbox)
+            # If folder was selected, validate it
+            if self.FOLDER_CONFIRMATION(self.DESTINATION_folder):
+                self.destination_entry.delete(0, tk.END)  # Clear the current entry
+                self.destination_entry.insert(0, self.DESTINATION_folder)  # Insert the new folder path
+                self.update_file_list(self.DESTINATION_folder, self.destination_listbox)  # Update file list in listbox
+                # Change the checkmark button color to lightgreen
+                self.checkmark_button_destination.config(bg="lightgreen")
+                print("Destination folder is valid and contains playlists.")
+            else:
+                # Folder exists but does not contain .lpl files
+                self.destination_entry.delete(0, tk.END)
+                # Change the checkmark button color to gray
+                self.checkmark_button_destination.config(bg="gray")
+        else:
+            # If no folder is selected
+            self.destination_entry.delete(0, tk.END)
+            # Change the checkmark button color to gray
+            self.checkmark_button_destination.config(bg="gray")
+
+    def FOLDER_CONFIRMATION(self, strFolder):
+        """Check if folder exists and contains .lpl files."""
+        if strFolder:
+            # Check if the folder exists
+            if os.path.exists(strFolder):
+                # Check if there are any .lpl files in the folder
+                lpl_files = glob.glob(os.path.join(strFolder, "*.lpl"))
+                
+                if lpl_files:
+                    # Folder exists and contains .lpl files
+                    return True
+                else:
+                    # Folder exists but does not contain .lpl files
+                    messagebox.showwarning("No Playlists", "The source folder does not contain any playlists (.lpl files).")
+                    print("No playlists found in the source folder.")
+                    return False
+            else:
+                # Folder doesn't exist
+                messagebox.showerror("Folder Not Found", "The source folder does not exist.")
+                print("Source folder does not exist.")
+                return False
+        else:
+            # Source folder entry is empty
+            print("Source folder entry is empty.")
+            return False
 
 # Buttons under Source Playlists listbox
     def restart_app(self):
