@@ -2,73 +2,102 @@ import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
-def create_menu(app):
+def create_menu(self):
     """Create the menu bar with File and Help options."""
-    menu_bar = tk.Menu(app.root, bg="#007ACC", fg="white", font=("Helvetica", 10))
+    menu_bar = tk.Menu(self.root, bg="#007ACC", fg="white", font=("Helvetica", 10))
 
     file_menu = tk.Menu(menu_bar, tearoff=0, bg="#0099FF", fg="white")
-    file_menu.add_command(label="Select Source Folder", command=app.select_source_folder)
-    file_menu.add_command(label="Select Destination Folder", command=app.select_DESTINATION_folder)
-    file_menu.add_command(label="Refresh", command=app.refresh_app)
-    file_menu.add_command(label="Exit", command=app.exit_app)
+    file_menu.add_command(label="Select Source Folder", command=self.select_SOURCE_folder)
+    file_menu.add_command(label="Select Destination Folder", command=self.select_DESTINATION_folder)
+    file_menu.add_command(label="Restart", command=self.restart_app)
+    file_menu.add_command(label="Exit", command=self.exit_app)
     menu_bar.add_cascade(label="File", menu=file_menu)
 
     help_menu = tk.Menu(menu_bar, tearoff=0, bg="#0099FF", fg="white")
-    help_menu.add_command(label="About", command=app.show_about)
+    help_menu.add_command(label="About", command=self.show_about)
     menu_bar.add_cascade(label="Help", menu=help_menu)
 
-    app.root.config(menu=menu_bar)
+    self.root.config(menu=menu_bar)
 
-def create_widgets(app):
-    """Create GUI components."""
-    app.source_label = tk.Label(app.root, text="Source Playlists", bg="#F0F0F0", font=("Helvetica", 12, "bold"))
-    app.source_label.grid(row=0, column=0, padx=10, pady=5, sticky="ew")
+def create_widgets(self):
+    # Configure the root grid layout
+    self.root.grid_columnconfigure(0, weight=0)  # Label column
+    self.root.grid_columnconfigure(1, weight=1)  # Entry/Listbox column (expandable)
+    self.root.grid_columnconfigure(2, weight=0)  # Button column
 
-    app.DESTINATION_label = tk.Label(app.root, text="Destination Playlists", bg="#F0F0F0", font=("Helvetica", 12, "bold"))
-    app.DESTINATION_label.grid(row=0, column=1, padx=10, pady=5, sticky="ew")
+    # Frame for source and destination selection
+    folder_frame = tk.Frame(self.root, bg="#F0F0F0", padx=10, pady=5)
+    folder_frame.grid(row=0, column=0, columnspan=3, sticky="ew")
 
-    app.source_listbox = tk.Listbox(app.root, height=10, width=30, font=("Helvetica", 10), bg="#FFFFFF", selectmode=tk.SINGLE, bd=2, relief="solid")
-    app.source_listbox.grid(row=1, column=0, padx=20, pady=10)
+    # Source Folder
+    tk.Label(folder_frame, text="Source Folder:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
+    self.source_entry = tk.Entry(folder_frame, width=50)
+    self.source_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+    
+    # Checkmark button next to source_entry
+    self.checkmark_button_source = tk.Button(folder_frame, text="✓", command=self.check_source, width=2, height=1, font=("Helvetica", 10))
+    self.checkmark_button_source.grid(row=0, column=1, padx=(0, 5), pady=5, sticky="e")
+    
+    # Browse button for source folder
+    tk.Button(folder_frame, text="Browse", command=self.select_SOURCE_folder).grid(row=0, column=2, padx=5, pady=5)
 
-    app.DESTINATION_listbox = tk.Listbox(app.root, height=10, width=30, font=("Helvetica", 10), bg="#FFFFFF", selectmode=tk.MULTIPLE, bd=2, relief="solid")
-    app.DESTINATION_listbox.grid(row=1, column=1, padx=20, pady=10)
+    # Destination Folder
+    tk.Label(folder_frame, text="Destination Folder:").grid(row=1, column=0, padx=5, pady=5, sticky="w")
+    self.destination_entry = tk.Entry(folder_frame, width=40)
+    self.destination_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+    
+    # Checkmark button next to destination_entry
+    self.checkmark_button_destination = tk.Button(folder_frame, text="✓", command=self.check_destination, width=2, height=1, font=("Helvetica", 10))
+    self.checkmark_button_destination.grid(row=1, column=1, padx=(0, 5), pady=5, sticky="e")
+    
+    # Browse button for destination folder
+    tk.Button(folder_frame, text="Browse", command=self.select_DESTINATION_folder).grid(row=1, column=2, padx=5, pady=5)
 
-    app.select_all_button = tk.Button(app.root, text="Select All", command=app.select_all, bg="#4CAF50", fg="white", font=("Helvetica", 12), bd=0, relief="solid")
-    app.select_all_button.grid(row=2, column=1, padx=10, pady=5)
+    # Frame for playlist listboxes
+    playlist_frame = tk.Frame(self.root, bg="#F0F0F0", padx=10, pady=10)
+    playlist_frame.grid(row=1, column=0, columnspan=3, sticky="ew")
 
-    app.clear_selection_button = tk.Button(app.root, text="Clear Selection", command=app.clear_selection, bg="#FF9800", fg="white", font=("Helvetica", 12), bd=0, relief="solid")
-    app.clear_selection_button.grid(row=3, column=1, padx=10, pady=5)
+    # Source Playlists
+    tk.Label(playlist_frame, text="Source Playlists", bg="#F0F0F0", font=("Helvetica", 12, "bold")).grid(row=0, column=0, padx=5, pady=5)
+    self.source_listbox = tk.Listbox(playlist_frame, height=10, width=30, font=("Helvetica", 10), bd=2, relief="solid")
+    self.source_listbox.grid(row=1, column=0, padx=10, pady=5)
 
-    app.execute_button = tk.Button(app.root, text="EXECUTE", command=app.execute, bg="#4CAF50", fg="white", font=("Helvetica", 12), bd=0, relief="solid")
-    app.execute_button.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
+    # Destination Playlists
+    tk.Label(playlist_frame, text="Destination Playlists", bg="#F0F0F0", font=("Helvetica", 12, "bold")).grid(row=0, column=1, padx=5, pady=5)
+    self.destination_listbox = tk.Listbox(playlist_frame, height=10, width=30, font=("Helvetica", 10), bd=2, relief="solid", selectmode=tk.MULTIPLE)
+    self.destination_listbox.grid(row=1, column=1, padx=10, pady=5)
 
-    app.note_label = tk.Label(app.root, text=(
+    # Buttons for Options
+    tk.Button(playlist_frame, text="Restart", command=self.restart_app, bg="#2196F3", fg="white", font=("Helvetica", 12), bd=0, relief="solid").grid(row=2, column=0, padx=10, pady=5)
+    tk.Checkbutton(playlist_frame, text="Backup Destination Playlists", variable=self.backup_var, bg="#F0F0F0", font=("Helvetica", 10)).grid(row=3, column=0, padx=10, pady=5, sticky="w")
+    tk.Button(playlist_frame, text="Select All", command=self.select_all, bg="#4CAF50", fg="white", font=("Helvetica", 12), bd=0, relief="solid").grid(row=2, column=1, padx=10, pady=5)
+    tk.Button(playlist_frame, text="Clear Selection", command=self.clear_selection, bg="#FF9800", fg="white", font=("Helvetica", 12), bd=0, relief="solid").grid(row=3, column=1, padx=10, pady=5)
+
+    # Execute Button
+    self.execute_button = tk.Button(self.root, text="EXECUTE", command=self.execute, bg="#4CAF50", fg="white", font=("Helvetica", 12, "bold"), bd=0, relief="solid")
+    self.execute_button.grid(row=2, column=0, columnspan=3, padx=10, pady=20, sticky="n")
+
+    # Note Label
+    tk.Label(self.root, text=(
         "Only the selected playlists in the Destination list will be updated, "
         "if they exist in the Source list with the same name."
-    ), bg="#F0F0F0", font=("Helvetica", 10), fg="gray")
-    app.note_label.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
+    ), bg="#F0F0F0", font=("Helvetica", 10), fg="gray", wraplength=500, justify="center").grid(row=3, column=0, columnspan=3, padx=10, pady=10)
 
-    app.source_folder_label = tk.Label(app.root, text="No source folder selected", bg="#F0F0F0", font=("Helvetica", 10))
-    app.source_folder_label.grid(row=2, column=0, padx=20, pady=5, sticky="ew")
-    app.source_folder_label.bind("<Button-1>", app.on_source_folder_label_click)
-
-    app.DESTINATION_folder_label = tk.Label(app.root, text="No destination folder selected", bg="#F0F0F0", font=("Helvetica", 10))
-    app.DESTINATION_folder_label.grid(row=3, column=0, padx=20, pady=5, sticky="ew")
-    app.DESTINATION_folder_label.bind("<Button-1>", app.on_DESTINATION_folder_label_click)
-
-    app.refresh_button = tk.Button(app.root, text="Refresh", command=app.refresh_app, bg="#2196F3", fg="white", font=("Helvetica", 12), bd=0, relief="solid")
-    app.refresh_button.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
-    
-    app.backup_checkbox = tk.Checkbutton(app.root, text="Backup Destination Playlists", variable=app.backup_var)
-    app.backup_checkbox.grid(row=6, column=1, padx=5, pady=5)
-
-def update_file_list(app, folder, listbox):
+def update_file_list(self, folder, listbox):
     """Update the file list in the listbox."""
     listbox.delete(0, tk.END)  # Clear existing items
     try:
-        files = [f for f in os.listdir(folder) if f.endswith(".lpl")]
-        for file in files:
-            listbox.insert(tk.END, file)
+        # Check if the directory exists
+        if os.path.exists(folder):
+            # Get all files with the .lpl extension in the selected folder
+            files = [f for f in os.listdir(folder) if f.endswith(".lpl")]
+            if files:
+                for file in files:
+                    listbox.insert(tk.END, file)  # Insert file names into the listbox
+            else:
+                listbox.insert(tk.END, "No .lpl files found.")  # Message when no files found
+        else:
+            print(f"Error: Folder '{folder}' does not exist.")
     except Exception as e:
         print(f"Error loading files: {e}")
 
