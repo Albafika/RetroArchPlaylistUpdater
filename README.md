@@ -1,4 +1,4 @@
-# Playlist Updater
+# RetroArch Playlist Updater
 
 ## Overview
 
