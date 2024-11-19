@@ -11,205 +11,113 @@ from gui.gui_utils import create_menu, create_widgets, show_about, update_file_l
 def resource_path(relative_path):
     """Get the absolute path to a resource in the bundled executable."""
     try:
-        # For a frozen app (when running as an exe)
         if getattr(sys, 'frozen', False):
-            base_path = sys._MEIPASS  # This is the temporary folder where PyInstaller extracts the files
+            base_path = sys._MEIPASS
         else:
-            base_path = os.path.abspath(".")  # If running from source code
+            base_path = os.path.abspath(".")
         return os.path.join(base_path, relative_path)
     except Exception as e:
         print(f"Error getting resource path: {e}")
-        return relative_path  # Fallback to the relative path if something goes wrong
+        return relative_path
 
 class PlaylistUpdaterApp:
     def __init__(self, root):
         self.root = root
         self.root.title("RetroArch Playlist Updater by GoodLuckTrying")
-        self.root.geometry("500x550")  # Window size
-        self.root.configure(bg="#F0F0F0")  # Set a background color
+        self.root.geometry("500x550")
+        self.root.configure(bg="#F0F0F0")
 
-        # Set the icon for the Tkinter window (use resource_path to get the correct icon path)
-        icon_path = resource_path("Undine.ico")  # Replace with the correct icon filename
+        icon_path = resource_path("Undine.ico")
         self.root.iconbitmap(icon_path)
 
-        # Set the initial status for the "Destination backup" check
         self.backup_var = tk.BooleanVar()
-        # Set the initial folder paths to None
         self.SOURCE_folder = None
         self.DESTINATION_folder = None
 
-        # Create the menu bar
         create_menu(self)
-
-        # Create the UI components
         create_widgets(self)
 
-    def check_source(self):
-        source_folder = self.source_entry.get()
-        
-        # Check if the source folder path is not empty
-        if source_folder:
-            # Check if the folder exists
-            if os.path.exists(source_folder):
-                # Check if there are any .lpl files in the folder
-                lpl_files = glob.glob(os.path.join(source_folder, "*.lpl"))
-                
-                if lpl_files:
-                    # Folder exists and contains .lpl files, update the source entry
-                    self.SOURCE_folder = source_folder
-                    self.source_entry.delete(0, tk.END)  # Clear the current entry
-                    self.source_entry.insert(0, self.SOURCE_folder)  # Insert the new folder path
-                    self.update_file_list(self.SOURCE_folder, self.source_listbox)
-                    # Change the checkmark button color to lightgreen
-                    self.checkmark_button_source.config(bg="lightgreen")
-                    print("Source folder is valid and contains playlists.")
-                else:
-                    # Folder exists but does not contain .lpl files
-                    self.source_entry.delete(0, tk.END)
-                    messagebox.showwarning("No Playlists", "The source folder does not contain any playlists (.lpl files).")
-                    # Change the checkmark button color to gray
-                    self.checkmark_button_source.config(bg="gray")
-                    print("No playlists found in the source folder.")
-            else:
-                # Folder doesn't exist
-                self.source_entry.delete(0, tk.END)
-                messagebox.showerror("Folder Not Found", "The source folder does not exist.")
-                # Change the checkmark button color to gray
-                self.checkmark_button_source.config(bg="gray")
-                print("Source folder does not exist.")
-        else:
-            # Source folder entry is empty
-            # Change the checkmark button color to gray
-            self.checkmark_button_source.config(bg="gray")
-            print("Source folder entry is empty.")
+    def check_folder(self, folder_entry, listbox, checkmark_button, folder_type="source"):
+        """Helper function to check if a folder exists and contains .lpl files."""
+        folder = folder_entry.get()
 
+        if folder:
+            if os.path.exists(folder):
+                lpl_files = glob.glob(os.path.join(folder, "*.lpl"))
+                if lpl_files:
+                    # Update UI for valid folder
+                    self.update_folder(folder, folder_entry, listbox, checkmark_button, folder_type)
+                    print(f"{folder_type.capitalize()} folder is valid and contains playlists.")
+                else:
+                    self.handle_invalid_folder(folder_entry, checkmark_button, folder_type)
+            else:
+                self.handle_invalid_folder(folder_entry, checkmark_button, folder_type)
+        else:
+            self.handle_empty_folder(folder_entry, checkmark_button, folder_type)
+
+    def handle_invalid_folder(self, folder_entry, checkmark_button, folder_type):
+        """Handle the case where the folder does not exist or contains no playlists."""
+        folder_entry.delete(0, tk.END)
+        messagebox.showwarning(f"No Playlists", f"The {folder_type} folder does not contain any playlists (.lpl files).")
+        checkmark_button.config(bg="gray")
+        print(f"No playlists found in the {folder_type} folder.")
+
+    def handle_empty_folder(self, folder_entry, checkmark_button, folder_type):
+        """Handle the case where the folder entry is empty."""
+        checkmark_button.config(bg="gray")
+        print(f"{folder_type.capitalize()} folder entry is empty.")
+
+    def update_folder(self, folder, folder_entry, listbox, checkmark_button, folder_type):
+        """Update the folder path and listbox UI elements."""
+        setattr(self, f"{folder_type.upper()}_folder", folder)  # Update the instance variable (SOURCE or DESTINATION)
+        folder_entry.delete(0, tk.END)
+        folder_entry.insert(0, folder)
+        self.update_file_list(folder, listbox)
+        checkmark_button.config(bg="lightgreen")
+
+    def check_source(self):
+        self.check_folder(self.source_entry, self.source_listbox, self.checkmark_button_source, "source")
 
     def check_destination(self):
-        destination_folder = self.destination_entry.get()
-        
-        # Check if the source folder path is not empty
-        if destination_folder:
-            # Check if the folder exists
-            if os.path.exists(destination_folder):
-                # Check if there are any .lpl files in the folder
-                lpl_files = glob.glob(os.path.join(destination_folder, "*.lpl"))
-                
-                if lpl_files:
-                    # Folder exists and contains .lpl files, update the destination entry
-                    self.DESTINATION_folder = destination_folder
-                    self.destination_entry.delete(0, tk.END)  # Clear the current entry
-                    self.destination_entry.insert(0, self.DESTINATION_folder)  # Insert the new folder path
-                    self.update_file_list(self.DESTINATION_folder, self.destination_listbox)
-                    # Change the checkmark button color to lightgreen
-                    self.checkmark_button_destination.config(bg="lightgreen")
-                    print("Destination folder is valid and contains playlists.")
-                else:
-                    # Folder exists but does not contain .lpl files
-                    self.destination_entry.delete(0, tk.END)
-                    messagebox.showwarning("No Playlists", "The destination folder does not contain any playlists (.lpl files).")
-                    # Change the checkmark button color to gray
-                    self.checkmark_button_destination.config(bg="gray")
-                    print("No playlists found in the destination folder.")
+        self.check_folder(self.destination_entry, self.destination_listbox, self.checkmark_button_destination, "destination")
+
+    def on_folder_label_click(self, event, folder_type):
+        """Generic method for folder label clicks to open folder selection dialogs."""
+        self.select_folder(folder_type)
+
+    def select_folder(self, folder_type):
+        """Open dialog to select a folder and validate it."""
+        folder = filedialog.askdirectory(title=f"Select the {folder_type} Folder")
+        if folder:
+            if self.FOLDER_CONFIRMATION(folder):
+                folder_entry = getattr(self, f"{folder_type.lower()}_entry")
+                listbox = getattr(self, f"{folder_type.lower()}_listbox")
+                checkmark_button = getattr(self, f"checkmark_button_{folder_type.lower()}")
+                self.update_folder(folder, folder_entry, listbox, checkmark_button, folder_type.lower())
             else:
-                # Folder doesn't exist
-                self.destination_entry.delete(0, tk.END)
-                messagebox.showerror("Folder Not Found", "The destination folder does not exist.")
-                # Change the checkmark button color to gray
-                self.checkmark_button_destination.config(bg="gray")
-                print("Destination folder does not exist.")
+                self.handle_invalid_folder(folder_entry, checkmark_button, folder_type.lower())
         else:
-            # Source folder entry is empty
-            # Change the checkmark button color to gray
-            self.checkmark_button_destination.config(bg="gray")
-            print("Destination folder entry is empty.")
-
-    def on_source_folder_label_click(self, event):
-        """Handle click on source folder label."""
-        self.select_SOURCE_folder()
-
-    def on_DESTINATION_folder_label_click(self, event):
-        """Handle click on destination folder label."""
-        self.select_DESTINATION_folder()
-
-    def select_SOURCE_folder(self):
-        """Open dialog to select the SOURCE folder."""
-        # Open the file dialog to select a folder
-        self.SOURCE_folder = filedialog.askdirectory(title="Select the Source Folder")
-        
-        if self.SOURCE_folder:
-            # If folder was selected, validate it
-            if self.FOLDER_CONFIRMATION(self.SOURCE_folder):
-                self.source_entry.delete(0, tk.END)  # Clear the current entry
-                self.source_entry.insert(0, self.SOURCE_folder)  # Insert the new folder path
-                self.update_file_list(self.SOURCE_folder, self.source_listbox)  # Update file list in listbox
-                # Change the checkmark button color to lightgreen
-                self.checkmark_button_source.config(bg="lightgreen")
-                print("Source folder is valid and contains playlists.")
-            else:
-                # Folder exists but does not contain .lpl files
-                self.source_entry.delete(0, tk.END)
-                # Change the checkmark button color to gray
-                self.checkmark_button_source.config(bg="gray")
-        else:
-            # If no folder is selected
-            self.source_entry.delete(0, tk.END)
-            # Change the checkmark button color to gray
-            self.checkmark_button_source.config(bg="gray")
-
-    def select_DESTINATION_folder(self):
-        """Open dialog to select the DESTINATION folder."""
-        # Open the file dialog to select a folder
-        self.DESTINATION_folder = filedialog.askdirectory(title="Select the Destination Folder")
-        
-        if self.DESTINATION_folder:
-            # If folder was selected, validate it
-            if self.FOLDER_CONFIRMATION(self.DESTINATION_folder):
-                self.destination_entry.delete(0, tk.END)  # Clear the current entry
-                self.destination_entry.insert(0, self.DESTINATION_folder)  # Insert the new folder path
-                self.update_file_list(self.DESTINATION_folder, self.destination_listbox)  # Update file list in listbox
-                # Change the checkmark button color to lightgreen
-                self.checkmark_button_destination.config(bg="lightgreen")
-                print("Destination folder is valid and contains playlists.")
-            else:
-                # Folder exists but does not contain .lpl files
-                self.destination_entry.delete(0, tk.END)
-                # Change the checkmark button color to gray
-                self.checkmark_button_destination.config(bg="gray")
-        else:
-            # If no folder is selected
-            self.destination_entry.delete(0, tk.END)
-            # Change the checkmark button color to gray
-            self.checkmark_button_destination.config(bg="gray")
+            folder_entry = getattr(self, f"{folder_type.lower()}_entry")
+            checkmark_button = getattr(self, f"checkmark_button_{folder_type.lower()}")
+            self.handle_empty_folder(folder_entry, checkmark_button, folder_type.lower())
 
     def FOLDER_CONFIRMATION(self, strFolder):
         """Check if folder exists and contains .lpl files."""
         if strFolder:
-            # Check if the folder exists
             if os.path.exists(strFolder):
-                # Check if there are any .lpl files in the folder
                 lpl_files = glob.glob(os.path.join(strFolder, "*.lpl"))
-                
                 if lpl_files:
-                    # Folder exists and contains .lpl files
                     return True
                 else:
-                    # Folder exists but does not contain .lpl files
-                    messagebox.showwarning("No Playlists", "The source folder does not contain any playlists (.lpl files).")
-                    print("No playlists found in the source folder.")
+                    messagebox.showwarning("No Playlists", f"The folder {strFolder} does not contain any playlists (.lpl files).")
                     return False
             else:
-                # Folder doesn't exist
-                messagebox.showerror("Folder Not Found", "The source folder does not exist.")
-                print("Source folder does not exist.")
+                messagebox.showerror("Folder Not Found", f"The folder {strFolder} does not exist.")
                 return False
-        else:
-            # Source folder entry is empty
-            print("Source folder entry is empty.")
-            return False
+        return False
 
-# Buttons under Source Playlists listbox
     def restart_app(self):
-        """Clear paths, clear listboxes, and restarts the file lists."""
+        """Clear paths, clear listboxes, and restart the file lists."""
         try:
             # Clear the source and destination folder paths
             self.SOURCE_folder = ""
@@ -222,53 +130,43 @@ class PlaylistUpdaterApp:
             # Clear the entries
             self.source_entry.delete(0, tk.END)
             self.destination_entry.delete(0, tk.END)
-            # Optionally, load new default files or show a message (you can customize this)
-            #self.source_listbox.insert(tk.END, "No source files loaded.")
-            #self.destination_listbox.insert(tk.END, "No destination files loaded.")
-            
+
             print("App has been restarted.")
         except Exception as e:
             print(f"Error in restart_app: {e}")
 
-        
         self.backup_var.set(False)
 
     def backup_destination(self):
-        # Use the DESTINATION_folder set in the app
-        destination_folder = self.DESTINATION_folder  # Get folder from the class instance
-
-        if not destination_folder:  # Check if the destination folder is set
+        """Backup the destination folder by copying .lpl files to a backup folder."""
+        destination_folder = self.DESTINATION_folder
+        if not destination_folder:
             messagebox.showerror("Error", "Destination folder not selected!")
             return
 
-        # Create a timestamp for the backup folder name
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         backup_folder = os.path.join(destination_folder, f"backup_{timestamp}")
-
-        # Ensure the backup folder exists
         os.makedirs(backup_folder, exist_ok=True)
 
-        # Copy the .lpl files (or other necessary files) to the backup folder
         for file_name in os.listdir(destination_folder):
-            if file_name.endswith('.lpl'):  # Adjust if necessary to other types of playlists
+            if file_name.endswith('.lpl'):
                 source_file = os.path.join(destination_folder, file_name)
                 backup_file = os.path.join(backup_folder, file_name)
-                shutil.copy2(source_file, backup_file)  # Copy the file and preserve metadata
+                shutil.copy2(source_file, backup_file)
 
         print(f"Backup completed to {backup_folder}")
 
-# Buttons under Destination Playlists listbox
     def select_all(self):
         """Select all items in the destination listbox."""
         try:
-            self.destination_listbox.select_set(0, tk.END)    # Select all items in the destination listbox
+            self.destination_listbox.select_set(0, tk.END)
         except Exception as e:
             print(f"Error in select_all: {e}")
 
     def clear_selection(self):
         """Deselect all items in the destination listbox."""
         try:
-            self.destination_listbox.select_clear(0, tk.END)    # Deselect all items in destination listbox
+            self.destination_listbox.select_clear(0, tk.END)
         except Exception as e:
             print(f"Error in clear_selection: {e}")
 
@@ -290,7 +188,6 @@ class PlaylistUpdaterApp:
         """Exit the application."""
         self.root.quit()
 
-#Functions in gui_utils.py
     def show_about(self):
         """Show an 'About' message in a custom window with a fixed size."""
         show_about(self)
