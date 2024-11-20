@@ -34,7 +34,7 @@ def create_widgets(self):
     self.source_entry = tk.Entry(folder_frame, width=50)
     self.source_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
     # Checkmark button next to source_entry
-    self.checkmark_button_source = tk.Button(folder_frame, text="✓", command=lambda: self.check_folder(self.source_entry, self.source_listbox, self.checkmark_button_source), width=2, height=1, font=("Helvetica", 10))
+    self.checkmark_button_source = tk.Button(folder_frame, text="✓", command=lambda: self.check_folder(self.source_entry, self.source_listbox, self.checkmark_button_source, "SOURCE"), width=2, height=1, font=("Helvetica", 10))
     self.checkmark_button_source.grid(row=0, column=1, padx=(0, 5), pady=5, sticky="e")
     # Browse button for source folder
     tk.Button(folder_frame, text="Browse", command=lambda: self.select_folder("SOURCE")).grid(row=0, column=2, padx=5, pady=5)
@@ -44,7 +44,7 @@ def create_widgets(self):
     self.destination_entry = tk.Entry(folder_frame, width=40)
     self.destination_entry.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
     # Checkmark button next to destination_entry
-    self.checkmark_button_destination = tk.Button(folder_frame, text="✓", command=lambda: self.check_folder(self.destination_entry, self.destination_listbox, self.checkmark_button_destination), width=2, height=1, font=("Helvetica", 10))
+    self.checkmark_button_destination = tk.Button(folder_frame, text="✓", command=lambda: self.check_folder(self.destination_entry, self.destination_listbox, self.checkmark_button_destination, "DESTINATION"), width=2, height=1, font=("Helvetica", 10))
     self.checkmark_button_destination.grid(row=1, column=1, padx=(0, 5), pady=5, sticky="e")
     # Browse button for destination folder
     tk.Button(folder_frame, text="Browse", command=lambda: self.select_folder("DESTINATION")).grid(row=1, column=2, padx=5, pady=5)

@@ -23,7 +23,7 @@ def resource_path(relative_path):
 class PlaylistUpdaterApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("RetroArch Playlist Updater by GoodLuckTrying")
+        self.root.title("RetroArch Playlist Updater 1.2 by GoodLuckTrying")
         self.root.geometry("500x550")
         self.root.configure(bg="#F0F0F0")
 
@@ -37,7 +37,7 @@ class PlaylistUpdaterApp:
         create_menu(self)
         create_widgets(self)
 
-    def check_folder(self, folder_entry, listbox, checkmark_button, folder_type="source"):
+    def check_folder(self, folder_entry, listbox, checkmark_button, folder_type):
         """Helper function to check if a folder exists and contains .lpl files."""
         folder = folder_entry.get()
 
@@ -54,6 +54,22 @@ class PlaylistUpdaterApp:
                 self.handle_invalid_folder(folder_entry, checkmark_button, folder_type)
         else:
             self.handle_empty_folder(folder_entry, checkmark_button, folder_type)
+
+    def select_folder(self, folder_type):
+        """Open dialog to select a folder and validate it."""
+        folder = filedialog.askdirectory(title=f"Select the {folder_type} Folder")
+        if folder:
+            if self.FOLDER_CONFIRMATION(folder):
+                folder_entry = getattr(self, f"{folder_type.lower()}_entry")
+                listbox = getattr(self, f"{folder_type.lower()}_listbox")
+                checkmark_button = getattr(self, f"checkmark_button_{folder_type.lower()}")
+                self.update_folder(folder, folder_entry, listbox, checkmark_button, folder_type.lower())
+            else:
+                self.handle_invalid_folder(folder_entry, checkmark_button, folder_type.lower())
+        else:
+            folder_entry = getattr(self, f"{folder_type.lower()}_entry")
+            checkmark_button = getattr(self, f"checkmark_button_{folder_type.lower()}")
+            self.handle_empty_folder(folder_entry, checkmark_button, folder_type.lower())
 
     def handle_invalid_folder(self, folder_entry, checkmark_button, folder_type):
         """Handle the case where the folder does not exist or contains no playlists."""
@@ -84,22 +100,6 @@ class PlaylistUpdaterApp:
     def on_folder_label_click(self, event, folder_type):
         """Generic method for folder label clicks to open folder selection dialogs."""
         self.select_folder(folder_type)
-
-    def select_folder(self, folder_type):
-        """Open dialog to select a folder and validate it."""
-        folder = filedialog.askdirectory(title=f"Select the {folder_type} Folder")
-        if folder:
-            if self.FOLDER_CONFIRMATION(folder):
-                folder_entry = getattr(self, f"{folder_type.lower()}_entry")
-                listbox = getattr(self, f"{folder_type.lower()}_listbox")
-                checkmark_button = getattr(self, f"checkmark_button_{folder_type.lower()}")
-                self.update_folder(folder, folder_entry, listbox, checkmark_button, folder_type.lower())
-            else:
-                self.handle_invalid_folder(folder_entry, checkmark_button, folder_type.lower())
-        else:
-            folder_entry = getattr(self, f"{folder_type.lower()}_entry")
-            checkmark_button = getattr(self, f"checkmark_button_{folder_type.lower()}")
-            self.handle_empty_folder(folder_entry, checkmark_button, folder_type.lower())
 
     def FOLDER_CONFIRMATION(self, strFolder):
         """Check if folder exists and contains .lpl files."""
