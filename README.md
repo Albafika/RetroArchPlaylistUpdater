@@ -131,4 +131,4 @@ For questions or feature requests, contact:
 
 - Email: goodlucktrying00@gmail.com
 - Discord: GoodLuckTrying
-- GitHub: [Albafika/RetroArchPlaylistUpdater](https://github.com/Albafika/RetroArchPlaylistUpdater)
+- GitHub: [GoodLuckTrying/RetroArchPlaylistUpdater](https://github.com/GoodLuckTrying/RetroArchPlaylistUpdater)
