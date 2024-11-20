@@ -109,7 +109,7 @@ def show_about(app):
     text_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
     
     about_text = (
-        "RetroArch Playlist Updater & Synchronizer by GoodLuckTrying\n\n"
+        "RetroArch Playlist Updater & Synchronizer 1.2 by GoodLuckTrying\n\n"
         "- This tool helps you keep multiple instances of RetroArch's playlists (.lpl) in parity (and most importantly, retain custom labels).\n"
         "- It does not update your ROMs or ROM folders.\n"
         "- It copies all listed ROMs from the source playlist to the destination playlist (Update will only happen between playlists sharing name between folders).\n\n"

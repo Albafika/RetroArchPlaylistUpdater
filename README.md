@@ -89,8 +89,11 @@ If any fields are missing or incorrect, the tool won’t update the playlist cor
 5. **Execute the Update**:
     - Click **EXECUTE** to update the selected playlists in the Destination list with the ROMs listed in the Source playlists.
 
-* **Refresh the App**:
-    - Click **Refresh** to reset the folder paths and clear listboxes.
+* **Restart the App**:
+    - Click **Restart** to pretty much initialize the app with paths and checks cleared.
+
+* **Backup Destination Playlists**:
+    - Check  **Backup Destination Playlists** if you wish for the destination's playlists to be backed up in a folder in the same path (Folder will be named "backup_" + "current date").
 
  * **About the Application**:
     - View app details by selecting **Help > About**.

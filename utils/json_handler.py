@@ -22,10 +22,10 @@ def save_json(file_path, data):
     except Exception as e:
         print(f"Error saving file '{file_path}': {e}")
 
-def modify_json_file(file_path, source_data, DESTINATION_data):
+def modify_json_file(file_path, SOURCE_data, DESTINATION_data):
     """Modify the DESTINATION JSON data based on the source JSON data."""
-    if 'items' in source_data and 'items' in DESTINATION_data:
-        DESTINATION_data['items'] = source_data['items']
+    if 'items' in SOURCE_data and 'items' in DESTINATION_data:
+        DESTINATION_data['items'] = SOURCE_data['items']
         if 'default_core_path' in DESTINATION_data and 'default_core_name' in DESTINATION_data:
             default_core_path = DESTINATION_data['default_core_path']
             default_core_name = DESTINATION_data['default_core_name']
@@ -37,12 +37,25 @@ def modify_json_file(file_path, source_data, DESTINATION_data):
 
         if 'scan_content_dir' in DESTINATION_data:
             scan_content_dir = DESTINATION_data['scan_content_dir']
+            
+            # Retrieve the final folder's name in scan_content_dir (e.g., "Roms", "Romhacks", etc.)
+            final_folder_name = os.path.basename(scan_content_dir)
+            
             for item in DESTINATION_data['items']:
                 if 'path' in item:
                     current_path = item['path']
-                    dir_name, file_name = os.path.split(current_path)
-                    new_path = os.path.join(scan_content_dir, file_name)
-                    item['path'] = new_path
+                    
+                    # Find the index of the final folder (e.g., "Roms", "Romhacks", etc.)
+                    final_folder_index = current_path.lower().find(final_folder_name.lower())
+                    
+                    if final_folder_index != -1:
+                        # Extract the relative path after the final folder
+                        relative_path = current_path[final_folder_index + len(final_folder_name):]
+                        
+                        # Create the new path with the 'scan_content_dir' prefix
+                        new_path = os.path.join(scan_content_dir, relative_path.strip(os.sep))
+                        item['path'] = new_path
+
             update_path_separators(DESTINATION_data)
             save_json(file_path, DESTINATION_data)
         else:
